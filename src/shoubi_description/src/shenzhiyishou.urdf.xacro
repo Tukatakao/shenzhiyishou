@@ -1,0 +1,169 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name = "shenzhiyishou">
+    <!--xmlns：xacro表示这个文档里用的是xacro-->
+    <!-- 全局参数-->
+     <!-- 底座-->
+    <xacro:property name = "dizuo_w" value = "0.2"/>
+    <xacro:property name = "dizuo_l" value = "0.2"/>
+    <xacro:property name = "dizuo_h" value = "0.03"/>
+    <xacro:property name = "base_mass" value="1.3"/>
+
+     <!-- link长度-->
+    <xacro:property name = "link1_h" value = "0.3"/>
+    <xacro:property name = "link2_h" value = "0.3"/>
+    <xacro:property name = "link3_h" value = "0.2"/>  
+     <!-- link半径-->
+    <xacro:property name = "link_m_w" value = "0.025"/>
+    <xacro:property name = "link_m_l" value = "0.025"/>
+    <!-- 颜色
+    <xacro:property name = "a" value = "0.1"/>
+    <xacro:property name = "b" value = "0.8"/>
+    <xacro:property name = "c" value = "0.4"/>
+    <xacro:property name = "d" value = "1.0"/>
+    -->
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 连杆宏-->
+    <xacro:macro name = "link" params = "name l w h mass color a b c d">  
+        <link name = "${name}">
+            <visual>
+                <origin xyz="0 0 ${h/2}" rpy="0 0 0"/>
+                <geometry>
+                    <box size = "${l} ${w} ${h}"/>  
+                </geometry>
+                <material name="${color}">
+                    <color rgba="${a} ${b} ${c} ${d}"/>
+                </material> 
+            </visual>
+            <collision name="zhuti">
+                <origin xyz="0 0 ${h/2-0.01}" rpy="0 0 0"/>
+                <geometry>
+                    <box size = "${l} ${w} ${h-0.02}"/>
+                </geometry>
+            </collision>
+            <collision name="dianji">
+                <origin xyz="0 0 ${h-0.01}" rpy="0 0 0"/>
+                <geometry>
+                    <sphere radius="0.02"/>
+                </geometry>
+
+            </collision>
+            <inertial>
+                <mass value = "${mass}"/>
+                <inertia
+                    ixx="${mass*(l*l + h*h)/12}"
+                    iyy="${mass*(w*w + h*h)/12}"
+                    izz="${mass*(w*w + l*l)/12}"
+                    ixy="0.0" ixz="0.0" iyz="0.0" />
+                 
+            </inertial>
+        </link>
+    </xacro:macro>
+    <!-- 底座-->
+    <link name = "base_link">
+        <visual>
+            <geometry>
+                <box size ="${dizuo_l} ${dizuo_w} ${dizuo_h}"/>
+            </geometry>  
+            <material name="dizuodeyanse">
+                <color rgba="0.2 0.5 0.9 1.0"/>
+            </material> 
+        </visual>
+        <collision>
+            <geometry>
+                <box size ="${dizuo_l} ${dizuo_w} ${dizuo_h}"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value = "1.3"/>
+            <inertia ixx="${base_mass*(dizuo_l*dizuo_l + dizuo_h*dizuo_h)/12}"
+                     iyy="${base_mass*(dizuo_w*dizuo_w + dizuo_h*dizuo_h)/12}"
+                     izz="${base_mass*(dizuo_w*dizuo_w + dizuo_l*dizuo_l)/12}"
+                     ixy="0.0" ixz="0.0" iyz="0.0" />
+        </inertial>
+    </link>
+    <!-- 生成link-->
+    <xacro:link name="link1" h="${link1_h}"  w="${link_m_w}" l="${link_m_l}" mass="0.2"  color="link1se" a="1.0" b="0.0" c="0.0" d="1.0"/> 
+    <xacro:link name="link2" h="${link2_h}"  w="${link_m_w}" l="${link_m_l}" mass="0.2"  color="link2se" a="0.0" b="1.0" c="0.0" d="1.0"/> 
+    <xacro:link name="link3" h="${link3_h}"  w="${link_m_w}" l="${link_m_l}" mass="0.1"  color="link3se" a="0.0" b="0.0" c="1.0" d="1.0"/> 
+    
+    <link name="jiazi">
+        <visual>
+            <origin xyz="0 0 0.01" rpy="0 0 0"/>
+            <geometry>
+                <box size ="0.02 0.02 0.02"/>
+            </geometry>
+            <material name="jiazise">
+                <color rgba="0 0 0 1.0"/>
+            </material> 
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.01" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.02 0.02 0.02"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value ="0.001"/>
+            <inertia
+                ixx="${0.001*(0.02*0.02 + 0.02*0.02)/12}"
+                iyy="${0.001*(0.02*0.02 + 0.02*0.02)/12}"
+                izz="${0.001*(0.02*0.02 + 0.02*0.02)/12}"
+                ixy="0.0" ixz="0.0" iyz="0.0"/>
+        </inertial>
+         
+    </link>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- joint生成宏-->
+    <xacro:macro name= "joint" params = "name parent child x y z r p y2 x1 y1 z1 lower upper effort velocity">
+        <joint name ="${name}" type="revolute" >
+            <parent link ="${parent}"/>
+            <child link="${child}"/>
+            <origin xyz="${x} ${y} ${z}" rpy="${r} ${p} ${y2}"/>
+            <axis xyz ="${x1} ${y1} ${z1}"/>
+            <limit lower="${lower}" upper ="${upper}" effort="${effort}" velocity="${velocity}"/>
+      </joint>
+    </xacro:macro>
+    
+
+    <!-- 生成joint-->
+    
+    <xacro:joint name="l1_2" parent="link1" child ="link2"   x="0" y="0" z="0.3"   r="0" p="0" y2="0" x1="0" y1="1" z1="0" lower="-0.5236" upper="1.5708" effort="10.0" velocity="1.0"/>
+    <xacro:joint name="l2_3" parent="link2" child ="link3"   x="0" y="0" z="0.3"  r="0" p="0" y2="0" x1="0" y1="1" z1="0" lower="-1.5708" upper="1.5708" effort="10.0" velocity="1.0"/>
+    <joint name="b_1" type="revolute">
+        <parent link="base_link"/>
+        <child  link="link1"/>
+        <origin xyz="0 0 0.015" rpy="0 0 0"/>
+        <axis xyz ="0 0 1" rpy="0 0 0"/>
+        <limit lower="0.0" upper ="1.5708" effort="10.0" velocity="1.0"/>
+    </joint>
+    <joint name="jiaqu" type="fixed" >
+        <parent link = "link3"/>
+        <child link="jiazi"/>
+        <origin xyz="0 0 0.2" rpy="0 0 0"/>
+    </joint>
+    
+</robot>
