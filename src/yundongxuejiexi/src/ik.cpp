@@ -9,8 +9,8 @@ Kinematics::Kinematics() : dabi{0.3}, xiaobi{0.2}, link2_begin{0.315}
     link2_limit = {-0.5236, 1.5708};
     link3_limit = {-1.5708, 1.5708};
 }
-    bool Kinematics::yundongjie(double x, double y, double z, std::array<double, 3> &joint)
-    {
+bool Kinematics::yundongjie(double x, double y, double z, std::array<double, 3> &joint)
+{
         //计算腰关节
         double theta1 = atan2(y, x); // 计算xy平面以决定腰部旋转角度
         if (theta1 < link1_limit[0] - eps || theta1 > link1_limit[1] + eps)
@@ -59,11 +59,11 @@ Kinematics::Kinematics() : dabi{0.3}, xiaobi{0.2}, link2_begin{0.315}
         joint[1] = theta2;
         joint[2] = theta3;
         return true;   
-       }   
+}   
     
 
-    std::array<double,3> Kinematics::forward(const std::array<double, 3> &joint_angles)
-    {
+std::array<double,3> Kinematics::forward(const std::array<double, 3> &joint_angles)
+{
         
         double yao = joint_angles[0];
         double jian= joint_angles[1];
@@ -87,27 +87,12 @@ Kinematics::Kinematics() : dabi{0.3}, xiaobi{0.2}, link2_begin{0.315}
 
         return {x,y,z};
 
-    }
-
-
-int main()
-{
-    Kinematics solver;
-    std::array<double,3> joints;
-
-    double tx = 0.3, ty =0.2, tz =0.4;
-    std::cout << "测试物体位置(" << tx << "," << ty << "," << tz << ")" << std::endl;
-    if(solver.yundongjie(tx,ty,tz,joints))
-    {
-        std::cout << "求解成功" << std::endl;
-        std::cout << "三个关节弧度为:" << joints[0] <<","<<joints[1]<<","<<joints[2]<<"."<<std::endl;
-
-    } 
-    std::array<double,3> zhengjie = solver.forward(joints);
-    std::cout <<"运动学正解为："<< zhengjie[0] <<","<<zhengjie[1]<<","<<zhengjie[2]<<"."<<std::endl;
-    return 0;
-   
 }
+
+
+
+    
+
 
  
 
